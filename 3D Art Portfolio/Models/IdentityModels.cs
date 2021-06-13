@@ -9,6 +9,10 @@ namespace _3D_Art_Portfolio.Models
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit https://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public class ApplicationUser : IdentityUser
     {
+        //i tuka se dodadeni ovie dve
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public string ProfilePicture { get; set; }
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
@@ -20,6 +24,7 @@ namespace _3D_Art_Portfolio.Models
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        public DbSet<ProjectEntry> ProjectEntries { get; set; }
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
@@ -29,5 +34,6 @@ namespace _3D_Art_Portfolio.Models
         {
             return new ApplicationDbContext();
         }
+
     }
 }

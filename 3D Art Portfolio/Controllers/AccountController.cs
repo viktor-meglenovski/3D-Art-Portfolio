@@ -151,7 +151,14 @@ namespace _3D_Art_Portfolio.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser 
+                { 
+                    Name=model.Name,
+                    Surname=model.Surname,
+                    UserName = model.UserName, 
+                    Email = model.Email,
+                    ProfilePicture=model.ProfilePicture
+                };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
