@@ -64,7 +64,6 @@ namespace _3D_Art_Portfolio.Models
 
     public class RegisterViewModel
     {
-        //pri registracija se vnesuva ime i prezime 
 
         [Required]
         [Display(Name = "Name")]

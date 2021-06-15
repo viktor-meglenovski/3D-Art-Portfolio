@@ -196,14 +196,21 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\FileUploadModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ProjectEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\EditProfileViewModel.cs" />
     <Compile Include="ViewModels\ProfileViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\UserUploads\5040c28f-be62-43b5-b8e5-d34ee8a59d27\blue-copy-space-digital-background_23-2148821698.jpg" />
+    <Content Include="App_Data\UserUploads\7576e6ce-06e3-4b41-b80c-74b43ad2cd41\blue-copy-space-digital-background_23-2148821698.jpg" />
+    <Content Include="App_Data\UserUploads\7576e6ce-06e3-4b41-b80c-74b43ad2cd41\defaultProfilePicture.png" />
+    <Content Include="App_Data\UserUploads\d3e0c3c7-d02f-4304-a120-47abe71907ee\blue-copy-space-digital-background_23-2148821698.jpg" />
+    <Content Include="App_Data\UserUploads\d994d49b-8d3f-4949-a3bf-65dd3b320974\blue-copy-space-digital-background_23-2148821698.jpg" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -261,9 +268,12 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Profile\Index.cshtml" />
+    <Content Include="Views\Profile\EditProfile.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
+    <Folder Include="App_Data\UserUploads\aecf6623-a9cb-473e-bee4-314d93f1b100\" />
+    <Folder Include="App_Data\UserUploads\e11c19cd-102a-4a58-b403-e330c35ddfb1\" />
+    <Folder Include="UserUploads\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

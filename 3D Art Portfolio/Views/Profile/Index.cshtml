@@ -13,9 +13,9 @@
 </style>
 <div style="background:blue" class="pull-left">
     <h2>@Model.applicationUser.Name @Model.applicationUser.Surname</h2>
-    <img class="profilePicture" alt="Profile Picture" src=@Url.Content(@"~\Content\Images\defaultProfilePicture.png") />
+    <img class="profilePicture" alt="Profile Picture" src=@Url.Content(Model.applicationUser.ProfilePicture) />
     <h2>@@@Model.applicationUser.UserName</h2>
-    <a href="/EditProfile" class="btn btn-primary">Edit Profile</a>
+    <a href="/Profile/EditProfile" class="btn btn-primary">Edit Profile</a>
 </div>
 <div style="background:red">
     <h2>My Art Projects</h2>

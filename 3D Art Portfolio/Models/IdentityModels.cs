@@ -34,6 +34,5 @@ namespace _3D_Art_Portfolio.Models
         {
             return new ApplicationDbContext();
         }
-
     }
 }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using _3D_Art_Portfolio.ViewModels;
+using System.IO;
 
 namespace _3D_Art_Portfolio.Controllers
 {
@@ -28,6 +29,34 @@ namespace _3D_Art_Portfolio.Controllers
             var profileViewModel = new ProfileViewModel(user, projectEntries);
             return View(profileViewModel);
         }
-        
+        public ActionResult EditProfile()
+        {
+            var user = _userManager.FindById(User.Identity.GetUserId());
+            var model = new EditProfileViewModel(user.Id,user.Name, user.Surname, user.UserName, user.ProfilePicture);
+            return View(model);
+        }
+        [HttpPost]
+        public ActionResult EditProfile(EditProfileViewModel model)
+        {
+            if(ModelState.IsValid)
+            {
+                var toUpdate = _context.Users.Find(model.UserId);
+                if(toUpdate!=null)
+                {
+                    if(model.NewProfilePicture!=null)
+                    {
+                        string path = Path.Combine(Server.MapPath(@"~\UserUploads"), model.UserId, Path.GetFileName(model.NewProfilePicture.FileName));
+                        model.NewProfilePicture.SaveAs(path);
+                        toUpdate.ProfilePicture = Path.Combine(@"~\UserUploads", model.UserId, Path.GetFileName(model.NewProfilePicture.FileName));
+                    }
+                    toUpdate.Name = model.Name;
+                    toUpdate.Surname = model.Surname;
+                    toUpdate.UserName = model.UserName;
+                    _context.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+            }
+            return View(model);
+        }
     }
 }
