@@ -24,6 +24,7 @@ namespace _3D_Art_Portfolio
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
+                      "~/Content/appStyleSheet.css",
                       "~/Content/site.css"));
         }
     }

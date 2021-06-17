@@ -21,7 +21,10 @@ namespace _3D_Art_Portfolio.Controllers
             this._context = new ApplicationDbContext();
             this._userManager=new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(this._context));
         }
-        
+        protected override void Dispose(bool disposing)
+        {
+            _context.Dispose();
+        }
         public ActionResult Index()
         {
             var user = _userManager.FindById(User.Identity.GetUserId());
@@ -43,12 +46,6 @@ namespace _3D_Art_Portfolio.Controllers
                 var toUpdate = _context.Users.Find(model.UserId);
                 if(toUpdate!=null)
                 {
-                    if(model.NewProfilePicture!=null)
-                    {
-                        string path = Path.Combine(Server.MapPath(@"~\UserUploads"), model.UserId, Path.GetFileName(model.NewProfilePicture.FileName));
-                        model.NewProfilePicture.SaveAs(path);
-                        toUpdate.ProfilePicture = Path.Combine(@"~\UserUploads", model.UserId, Path.GetFileName(model.NewProfilePicture.FileName));
-                    }
                     toUpdate.Name = model.Name;
                     toUpdate.Surname = model.Surname;
                     toUpdate.UserName = model.UserName;
@@ -57,6 +54,26 @@ namespace _3D_Art_Portfolio.Controllers
                 }
             }
             return View(model);
+        }
+        [HttpPost]
+        public ActionResult ProfileImageUpload()
+        {
+            if (Request.Files.Count != 0)
+            {
+                var file = Request.Files[0];
+                var fileName = Path.GetFileName(file.FileName);
+                var path = Path.Combine(Server.MapPath("~/UserUploads/"), User.Identity.GetUserId(), fileName);
+                file.SaveAs(path);
+                var toUpdate = _context.Users.Find(User.Identity.GetUserId());
+                var newPath= toUpdate.ProfilePicture = Path.Combine(@"/UserUploads", toUpdate.Id, Path.GetFileName(fileName));
+                if (toUpdate!=null)
+                {
+                    toUpdate.ProfilePicture = newPath;
+                    _context.SaveChanges();
+                }
+                return Json(new { success = true, newImagePath = newPath }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { success = false }, JsonRequestBehavior.AllowGet);
         }
     }
 }

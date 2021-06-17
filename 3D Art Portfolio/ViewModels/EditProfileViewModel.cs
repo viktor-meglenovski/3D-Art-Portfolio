@@ -16,11 +16,7 @@ namespace _3D_Art_Portfolio.ViewModels
         [Required]
         public string UserName { get; set; }
         public string ProfilePicture { get; set; }
-        public HttpPostedFileBase NewProfilePicture { get; set; }
-        public EditProfileViewModel()
-        {
-            
-        }
+        public EditProfileViewModel(){}
         public EditProfileViewModel(string UserId, string Name, string Surname, string UserName, string ProfilePicture)
         {
             this.UserId = UserId;

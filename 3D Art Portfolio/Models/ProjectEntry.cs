@@ -12,22 +12,22 @@ namespace _3D_Art_Portfolio.Models
         public int ProjectId { get; set; }
         public string UserId { get; set; }
         [Required]
-        [Range(0, 160)]
+        [MaxLength(160)]
         public string Name { get; set; }
         [Required]
-        [Range(0,160)]
+        [MaxLength(160)]
         public string Description { get; set; }
         public string MainImage { get; set; }
-        virtual public List<String> ImageUrls { get; set; }
+        virtual public List<Image> ImageUrls { get; set; }
         virtual public List<String> SoftwareUsedUrls { get; set; }
-        //virtual public ApplicationUser User { get; set; } ne znam dali treba ova
         public int Likes { get; set; }
         public ProjectEntry()
         {
-            this.ImageUrls = new List<String>();
+            this.ImageUrls = new List<Image>();
             this.SoftwareUsedUrls = new List<String>();
+            this.Likes = 0;
         }
-        public ProjectEntry(string UserId, string Name, string Description, string MainImage, List<String> ImageUrls, List<String> SoftwareUsedUrls)
+        public ProjectEntry(string UserId, string Name, string Description, string MainImage, List<Image> ImageUrls, List<String> SoftwareUsedUrls)
         {
             this.UserId = UserId;
             this.Name = Name;
@@ -36,6 +36,14 @@ namespace _3D_Art_Portfolio.Models
             this.ImageUrls = ImageUrls;
             this.SoftwareUsedUrls = SoftwareUsedUrls;
             this.Likes = 0;
+        }
+        public void addLike()
+        {
+            Likes++;
+        }
+        public void removeLike()
+        {
+            Likes--;
         }
     }
 }

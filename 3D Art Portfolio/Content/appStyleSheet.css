@@ -1,0 +1,15 @@
+﻿body {
+}
+.profilePicture {
+    max-width: 150px;
+}
+
+.mainImages {
+    max-width: 150px;
+}
+.normalImages{
+    max-width:500px;
+}
+.otherImages{
+    max-width:200px;
+}
