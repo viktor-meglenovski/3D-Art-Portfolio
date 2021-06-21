@@ -1,0 +1,30 @@
+﻿@model IEnumerable<_3D_Art_Portfolio.Models.ApplicationUser>
+@{
+    ViewBag.Title = "Manage Users";
+}
+
+<h2>Manage Users</h2>
+
+<table>
+    <thead>
+        <tr>
+            <td>User Name</td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var user in @Model)
+            {
+                <tr>
+                    <td>@user.UserName</td>
+                    <td>
+                        <a href=@String.Format("/Administrator/DeleteUser?id="+ @user.Id) >Delete User</a>
+                    </td>
+                </tr>
+            }
+    </tbody>
+</table>
+<div>
+    @Html.ActionLink("Back to Administrator Panel", "AdministratorPanel")
+</div>
+

@@ -11,6 +11,14 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
+            @Html.DisplayNameFor(model => model.TimeStamp)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TimeStamp)
+        </dd>
+
+        <dt>
             @Html.DisplayNameFor(model => model.Name)
         </dt>
 
@@ -42,10 +50,10 @@
         </dd>
 
         <p>Other images:</p>
-                @foreach (Image i in Model.ImageUrls)
-                {
-                    <img class="otherImages" src=@Url.Content(i.Url) />
-                }
+        @foreach (Image i in Model.ImageUrls)
+        {
+            <img class="otherImages" src=@Url.Content(i.Url) />
+        }
 
     </dl>
 </div>

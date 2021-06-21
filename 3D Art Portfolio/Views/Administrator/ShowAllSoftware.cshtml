@@ -1,0 +1,31 @@
+﻿@model IEnumerable<_3D_Art_Portfolio.Models.Software>
+@using _3D_Art_Portfolio.Models
+@{
+    ViewBag.Title = "ShowAllSoftware";
+}
+
+<h2>Show all software that is available for users to choose</h2>
+<a href="/Administrator/AddSoftware" class="btn btn-primary">Add new Software</a>
+<table>
+    <thead>
+        <tr>
+            <td>Software Name</td>
+            <td>Software Logo</td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(Software s in Model)
+        {
+        <tr>
+            <td>@s.Name</td>
+            <td><img class="otherImages"alt="@s.Name Logo", src="@Url.Content(s.ImageUrl)"/></td>
+            <td><a href=@String.Format("/Administrator/DeleteSoftware/"+s.Id)>Delete</a></td>
+        </tr>
+        }
+    </tbody>
+</table>
+<div>
+    @Html.ActionLink("Back to Administrator Panel", "AdministratorPanel")
+</div>
+

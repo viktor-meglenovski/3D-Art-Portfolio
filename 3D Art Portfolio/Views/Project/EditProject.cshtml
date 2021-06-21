@@ -1,0 +1,125 @@
+﻿@model _3D_Art_Portfolio.ViewModels.EditProjectEntryViewModel
+@using _3D_Art_Portfolio.Models
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm("EditProject", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>EditProjectEntryViewModel</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        @Html.HiddenFor(model => model.ProjectId)
+        <img alt="@Model.Name" src=@Url.Content(Model.MainImage) id="mainImage" />
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.NewMainImage, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.NewMainImage, new { type = "file", htmlAttributes = new { @class = "form-control", @id="newMainImage" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p>Other images:</p>
+            @foreach (Image i in Model.Images)
+            {
+                <span>
+                    <img class="@i.Id otherImages" src=@Url.Content(i.Url) />
+                    <button type="button" deleteId="@i.Id" class="imageDelete">Delete Image</button>
+                </span>
+            }
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.NewImageUrls, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.NewImageUrls, new { type = "file", multiple = "multiple", htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.NewImageUrls, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+@section Scripts{
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#NewMainImage").change(function () {
+                var formData = new FormData();
+                var totalFiles = document.getElementById("NewMainImage").files.length;
+                if (totalFiles == 0)
+                    return;
+                var file = document.getElementById("NewMainImage").files[0];
+                formData.append("NewMainImage", file);
+                $.ajax({
+                    type: "POST",
+                    url: '/Project/ChangeMainImage',
+                    data: formData,
+                    dataType: 'json',
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response.success) {
+                            $("#mainImage").attr("src", response.newImagePath);
+                        }
+                    },
+                    error: function(response) {
+                        console.log("error");
+                    }
+                }).done(function () {
+                }).fail(function (xhr, status, errorThrown) {
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $(".imageDelete").click(function () {
+                var link = $(this);
+                $.ajax({
+                    method: "GET",
+                    url: "/Project/DeleteImage/" + link.attr("deleteId"),
+                    success: function () {
+                        link.parents("span").remove().draw();
+                    },
+                    error: function (response) {
+                        console.log("error");
+                    }
+                })
+            });
+        });
+    </script>
+}

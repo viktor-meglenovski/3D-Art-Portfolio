@@ -170,16 +170,19 @@ namespace _3D_Art_Portfolio.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    if(user.Email.Contains("admin"))
+                        await UserManager.AddToRoleAsync(user.Id, "Administrator");
+                    else
+                        await UserManager.AddToRoleAsync(user.Id, "User");
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
+                     // Send an email with this link
+                     // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                     // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                     // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
-
-                    //pri registracija na sekoj nov korisnik se pravi nov folder za nego kade site negovi prikaceni fajlovi ke se cuvaat
-                    var path = Server.MapPath("~/UserUploads/" +user.Id);
+                     //pri registracija na sekoj nov korisnik se pravi nov folder za nego kade site negovi prikaceni fajlovi ke se cuvaat
+                     var path = Server.MapPath("~/UserUploads/" +user.Id);
                     Directory.CreateDirectory(path);
                     return RedirectToAction("Index", "Home");
                 }

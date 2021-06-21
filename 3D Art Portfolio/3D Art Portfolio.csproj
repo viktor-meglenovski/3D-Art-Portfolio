@@ -168,6 +168,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdministratorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
@@ -215,6 +216,26 @@
     <Compile Include="Migrations\202106171218267_change.Designer.cs">
       <DependentUpon>202106171218267_change.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202106191217493_roles.cs" />
+    <Compile Include="Migrations\202106191217493_roles.Designer.cs">
+      <DependentUpon>202106191217493_roles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202106191221057_makeAdmin.cs" />
+    <Compile Include="Migrations\202106191221057_makeAdmin.Designer.cs">
+      <DependentUpon>202106191221057_makeAdmin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202106191336292_likeModelChange.cs" />
+    <Compile Include="Migrations\202106191336292_likeModelChange.Designer.cs">
+      <DependentUpon>202106191336292_likeModelChange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202106211126238_softwareModel.cs" />
+    <Compile Include="Migrations\202106211126238_softwareModel.Designer.cs">
+      <DependentUpon>202106211126238_softwareModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202106211128371_softwareModel1.cs" />
+    <Compile Include="Migrations\202106211128371_softwareModel1.Designer.cs">
+      <DependentUpon>202106211128371_softwareModel1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\FileUploadModel.cs" />
@@ -224,9 +245,12 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\PrimaryKeyAttribute.cs" />
     <Compile Include="Models\ProjectEntry.cs" />
+    <Compile Include="Models\Software.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\AddSoftwareViewModel.cs" />
     <Compile Include="ViewModels\EditProfileViewModel.cs" />
+    <Compile Include="ViewModels\EditProjectEntryViewModel.cs" />
     <Compile Include="ViewModels\ProfileViewModel.cs" />
     <Compile Include="ViewModels\ProjectEntryViewModel.cs" />
   </ItemGroup>
@@ -246,6 +270,12 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Scripts\bootbox.all.js" />
+    <Content Include="Scripts\bootbox.all.min.js" />
+    <Content Include="Scripts\bootbox.js" />
+    <Content Include="Scripts\bootbox.locales.js" />
+    <Content Include="Scripts\bootbox.locales.min.js" />
+    <Content Include="Scripts\bootbox.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
@@ -299,11 +329,20 @@
     <Content Include="Views\Profile\EditProfile.cshtml" />
     <Content Include="Views\Project\AddNewProject.cshtml" />
     <Content Include="Views\Project\ViewProject.cshtml" />
+    <Content Include="Views\Project\EditProject.cshtml" />
+    <Content Include="Views\Profile\Search.cshtml" />
+    <Content Include="Views\Profile\ViewProfile.cshtml" />
+    <Content Include="Views\Profile\AdministratorPanel.cshtml" />
+    <Content Include="Views\Administrator\AdministratorPanel.cshtml" />
+    <Content Include="Views\Administrator\ManageUsers.cshtml" />
+    <Content Include="Views\Administrator\ShowAllSoftware.cshtml" />
+    <Content Include="Views\Administrator\AddSoftware.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\UserUploads\aecf6623-a9cb-473e-bee4-314d93f1b100\" />
     <Folder Include="App_Data\UserUploads\e11c19cd-102a-4a58-b403-e330c35ddfb1\" />
-    <Folder Include="UserUploads\" />
+    <Folder Include="Content\Images\Software\" />
+    <Folder Include="UserUploads\Temp\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -348,6 +387,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202106171218267_change.resx">
       <DependentUpon>202106171218267_change.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106191217493_roles.resx">
+      <DependentUpon>202106191217493_roles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106191221057_makeAdmin.resx">
+      <DependentUpon>202106191221057_makeAdmin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106191336292_likeModelChange.resx">
+      <DependentUpon>202106191336292_likeModelChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106211126238_softwareModel.resx">
+      <DependentUpon>202106211126238_softwareModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106211128371_softwareModel1.resx">
+      <DependentUpon>202106211128371_softwareModel1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

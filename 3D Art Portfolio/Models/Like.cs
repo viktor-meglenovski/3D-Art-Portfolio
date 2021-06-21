@@ -9,10 +9,10 @@ namespace _3D_Art_Portfolio.Models
     {
         [PrimaryKey]
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public int ProjectId { get; set; }
         public Like() { }
-        public Like(int UserId, int ProjectId)
+        public Like(string UserId, int ProjectId)
         {
             this.UserId = UserId;
             this.ProjectId = ProjectId;

@@ -33,7 +33,7 @@
                         <th>@pe.Name</th>
                         <th><img class="profilePicture" alt=@pe.Name src=@Url.Content(pe.MainImage) /></th>
                         <th><a href="/Project/ViewProject/@pe.ProjectId">View details</a></th>
-                        <th><a href="/Project/Edit/@pe.ProjectId" class="btn btn-primary">EDIT</a> <a href="/Project/Delete/@pe.ProjectId" class="btn btn-primary"> DELETE</a></th>
+                        <th><a href="/Project/EditProject/@pe.ProjectId" class="btn btn-primary">EDIT</a> <a href="/Project/DeleteProject/@pe.ProjectId" class="btn btn-primary"> DELETE</a></th>
                     </tr>
                 }
             </tbody>
@@ -42,6 +42,74 @@
 
     <a href="/Project/AddNewProject" class="btn btn-primary">Add new Project</a>
 </div>
+
+<button type="button" id="search" class="btn btn-primary">Search</button>
+<div id="searchForm" style="display:none">
+    <input type="text" placeholder="Search" class="searchText" />
+    <table id="table">
+        <thead>
+            <tr>
+                <td></td>
+                <td>User Name</td>
+            </tr>
+        </thead>
+        <tbody class="tableBody">
+        </tbody>
+    </table>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("#search").on("click", function (event) {
+                var modal = bootbox.dialog({
+                    message: $("#searchForm").html(),
+                    title: "Search",
+                    buttons: [
+                        {
+                            label: "Close",
+                            className: "btn btn-default pull-left",
+                            callback: function () {
+                                console.log("just do something on close");
+                            }
+                        }
+                    ],
+                    show: false,
+                    onEscape: function () {
+                        modal.modal("hide");
+                    }
+                });
+                modal.modal("show");
+                $(".modal .searchText").keyup(function () {
+                    var textToPass = $(".modal .searchText").val();
+                    console.log("tuka")
+                    console.log(textToPass);
+                    $.ajax({
+                        type: "GET",
+                        url: '/Profile/Search',
+                        data: jQuery.param({ text: textToPass }),
+                        contentType: false,
+                        processData: false,
+                        success: function (results) {
+                            console.log(results);
+                            $(".modal .tableBody").html(results);
+                        },
+                        error: function (results) {
+                            console.log("error");
+                        }
+                    }).done(function () {
+                    }).fail(function (xhr, status, errorThrown) {
+                    });
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+           
+        })
+    </script>
+
+}
 
 
 

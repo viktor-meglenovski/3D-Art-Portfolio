@@ -16,6 +16,7 @@
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
     @Html.HiddenFor(model => model.UserId)
+
     <img style="max-width:200px" alt="Your profile picture" src="@Url.Content(Model.ProfilePicture)" id="ProfilePicture"/>
 
     <div class="form-group">
@@ -51,7 +52,7 @@
 
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Save Changes" class="btn btn-default" />
+            <input id="submit" type="submit" value="Save Changes" class="btn btn-default" />
         </div>
     </div>
 </div>

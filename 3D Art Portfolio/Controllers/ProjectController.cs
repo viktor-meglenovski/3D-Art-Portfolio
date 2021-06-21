@@ -48,7 +48,7 @@ namespace _3D_Art_Portfolio.Controllers
                 //prvo go pravime folderot vrz osnova na ID to dodeleno vo bazata
                 var path = Server.MapPath("~/UserUploads/" + User.Identity.GetUserId() + "/" + temp.ProjectId);
                 Directory.CreateDirectory(path);
-                //a potoa gi zacuvuvame site sliki vo soodvetniot folder
+                //ja zacuvuvame glavnata slika
                 var image = Path.GetFileName(model.MainImage.FileName);
                 path = Path.Combine(Server.MapPath("~/UserUploads/"), User.Identity.GetUserId(), temp.ProjectId.ToString(),image);
                 model.MainImage.SaveAs(path);
@@ -61,6 +61,7 @@ namespace _3D_Art_Portfolio.Controllers
                     img.SaveAs(path);
                     _context.Images.Add(new Image(temp.ProjectId, Path.Combine("~/UserUploads/", User.Identity.GetUserId(), temp.ProjectId.ToString(), image)));
                 }
+                temp.TimeStamp = DateTime.Now.ToString("MMMM d, yyyy h:mm tt");
                 _context.SaveChanges();
                 return RedirectToAction("ViewProject/"+ temp.ProjectId);
             }
@@ -74,20 +75,118 @@ namespace _3D_Art_Portfolio.Controllers
             model.ImageUrls = _context.Images.Where(x => x.ProjectId == id).ToList();
             return View(model);
         }
-        public ActionResult Delete(int id)
+        public ActionResult DeleteProject(int id)
         {
             var project = _context.ProjectEntries.Find(id);
-            //if(User.Identity.GetUserId()!=project.UserId) nekoj drug korisnik probuva da izbrisi, ova da ne se dozvoli i vo drugi funkcii - potocno edit za drugi ne znnam dali ke treba
+            if (User.Identity.GetUserId() != project.UserId && !User.IsInRole("Administrator"))
+                //nekoj drug korisnik probuva da izbrisi, ova da ne se dozvoli i vo drugi funkcii - potocno edit za drugi ne znnam dali ke treba
+                return Content("no permissions");
             if (project == null)
                 return new HttpNotFoundResult();
-            var userId = project.UserId;
-            var projectFolder = Path.Combine(Server.MapPath("~/UserUploads/"), userId, id.ToString());
-            var images = _context.Images.Where(x => x.ProjectId == id);
-            _context.Images.RemoveRange(images);
-            _context.ProjectEntries.Remove(project);
-            _context.SaveChanges();
-            Directory.Delete(projectFolder,true);
             return RedirectToAction("Index","Profile");
         }
+        public void DeleteProject(ProjectEntry project)
+        {
+            if (User.Identity.GetUserId() == project.UserId)
+            {
+                var id = project.ProjectId;
+                var userId = project.UserId;
+                var projectFolder = Path.Combine(Server.MapPath("~/UserUploads/"), userId, id.ToString());
+                var images = _context.Images.Where(x => x.ProjectId == id);
+                var likes = _context.Likes.Where(x => x.ProjectId == id);
+                _context.Images.RemoveRange(images);
+                _context.Likes.RemoveRange(likes);
+                _context.ProjectEntries.Remove(project);
+                _context.SaveChanges();
+                Directory.Delete(projectFolder, true);
+            }  
+        }
+        public ActionResult EditProject(int id)
+        { 
+            var project = _context.ProjectEntries.Find(id);
+            if (project == null)
+                return new HttpNotFoundResult();
+            if (User.Identity.GetUserId() != project.UserId)
+                return Content("no permissions");
+            var images = _context.Images.Where(x => x.ProjectId == id).ToList();
+            var model = new EditProjectEntryViewModel(id,project.Name,project.Description,project.MainImage,images);
+            return View(model);
+        }
+        [HttpPost]
+        public ActionResult EditProject(EditProjectEntryViewModel model)
+        {
+            if(!ModelState.IsValid)
+                return View(model);
+            var toUpdate = _context.ProjectEntries.Find(model.ProjectId);
+            if (toUpdate == null)
+                return new HttpNotFoundResult();
+            if (User.Identity.GetUserId() != toUpdate.UserId)
+                return Content("no permissions");
+
+            toUpdate.Name = model.Name;
+            toUpdate.Description = model.Description;
+
+            var projectFolder = Path.Combine(Server.MapPath("~/UserUploads/"), User.Identity.GetUserId(), model.ProjectId.ToString());
+
+            if (model.NewMainImage!=null)
+            {
+                var newImage = model.NewMainImage;
+                var filename = newImage.FileName;
+                newImage.SaveAs(Path.Combine(projectFolder, filename));
+                var pathInBase = Path.Combine("~/UserUploads/", User.Identity.GetUserId(), model.ProjectId.ToString(), filename);
+                toUpdate.MainImage = pathInBase;
+            }
+
+            //zacuvuvanje na novite sliki, ovie ne se prikazuvaat vednas za razlika od main image
+            foreach(HttpPostedFileBase file in model.NewImageUrls)
+            {
+                if(file!=null)
+                {
+                    var filename = file.FileName;
+                    file.SaveAs(Path.Combine(projectFolder, filename));
+                    var pathInBase = Path.Combine("~/UserUploads/", User.Identity.GetUserId(), model.ProjectId.ToString(), filename);
+                    _context.Images.Add(new Image(model.ProjectId, pathInBase));
+                }
+            }
+            _context.SaveChanges();
+            var id = model.ProjectId;
+            return RedirectToAction("ViewProject/"+id);
+        }
+        //funkcija so ajax za brisenje na sliki od proektot
+        public JsonResult DeleteImage(int id)
+        {
+            var toDelete = _context.Images.Find(id);
+            if (toDelete!=null)
+            {
+                var project = _context.ProjectEntries.Find(toDelete.ProjectId);
+
+                if(project.UserId!=User.Identity.GetUserId())
+                    return Json(false, JsonRequestBehavior.AllowGet);
+
+                var filename = Path.Combine(Server.MapPath("~/UserUploads/"), User.Identity.GetUserId(),project.ProjectId.ToString(), id.ToString());
+                System.IO.File.Delete(filename);
+                _context.Images.Remove(toDelete);
+                _context.SaveChanges();
+                return Json(true, JsonRequestBehavior.AllowGet);
+
+            }
+            return Json(false, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public ActionResult ChangeMainImage()
+        {
+            //funkcija so ajax za stavanje na nova main slika na proektot, vednas se prikazuva, ako ne se klikni Save ne se zacuvuva vo baza ova
+            if (Request.Files.Count != 0)
+            {
+                var file = Request.Files[0];
+                var fileName = Path.GetFileName(file.FileName);
+                var path = Path.Combine(Server.MapPath("~/UserUploads/Temp"), fileName);
+                file.SaveAs(path);
+                var newPath = Path.Combine(@"/UserUploads/Temp", Path.GetFileName(fileName));
+                return Json(new { success = true, newImagePath = newPath }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

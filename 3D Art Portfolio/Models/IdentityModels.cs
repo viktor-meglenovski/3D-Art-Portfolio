@@ -27,6 +27,7 @@ namespace _3D_Art_Portfolio.Models
         public DbSet<ProjectEntry> ProjectEntries { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Like> Likes { get; set; }
+        public DbSet<Software> Softwares { get; set; }
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
