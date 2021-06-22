@@ -1,0 +1,23 @@
+﻿@model IEnumerable<_3D_Art_Portfolio.Models.ApplicationUser>
+
+<table>
+    <thead>
+        <tr>
+            <td>Profile Picture</td>
+            <td>Username</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var x in Model)
+            {
+                <tr>
+                    <td>
+                        <img class="otherImages", alt="@x.UserName" src="@Url.Content(x.ProfilePicture)"/>
+                    </td>
+                    <td>
+                        <a href=@String.Format("/Profile/ViewProfile/"+ @x.Id)>@@@x.UserName</a>
+                    </td>
+                </tr>
+            }
+    </tbody>
+</table>

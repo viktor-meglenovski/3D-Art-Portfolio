@@ -12,7 +12,7 @@
         {
             <tr>
                 <td><img class="otherImages" alt="@a.UserName" src=@Url.Content(a.ProfilePicture) /></td>
-                <td><a href="/Profile/ViewProfile/"+ @a.Id>@a.UserName</a></td>
+                <td><a href=@String.Format("/Profile/ViewProfile/"+ @a.Id)>@a.UserName</a></td>
             </tr>
         }
     }

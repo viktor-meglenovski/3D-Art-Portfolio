@@ -31,6 +31,7 @@ namespace _3D_Art_Portfolio.Controllers
         public ActionResult AddNewProject()
         {
             var model = new ProjectEntryViewModel();
+            model.AllSoftware = new SelectList(_context.Softwares.ToList(),"Id","Name");
             return View(model);
         }
         [HttpPost]
@@ -38,6 +39,7 @@ namespace _3D_Art_Portfolio.Controllers
         {
             if(ModelState.IsValid)
             {
+                //pravime soodveten objekt i go zacuvuvame vo baza so cel da dobieme ID za nego
                 ProjectEntry temp = new ProjectEntry() { 
                 UserId= User.Identity.GetUserId(),
                 Name=model.Name,
@@ -45,14 +47,17 @@ namespace _3D_Art_Portfolio.Controllers
                 };
                 _context.ProjectEntries.Add(temp);
                 _context.SaveChanges();
+
                 //prvo go pravime folderot vrz osnova na ID to dodeleno vo bazata
                 var path = Server.MapPath("~/UserUploads/" + User.Identity.GetUserId() + "/" + temp.ProjectId);
                 Directory.CreateDirectory(path);
+
                 //ja zacuvuvame glavnata slika
                 var image = Path.GetFileName(model.MainImage.FileName);
                 path = Path.Combine(Server.MapPath("~/UserUploads/"), User.Identity.GetUserId(), temp.ProjectId.ToString(),image);
                 model.MainImage.SaveAs(path);
                 temp.MainImage= Path.Combine("~/UserUploads/", User.Identity.GetUserId(), temp.ProjectId.ToString(), image);
+
                 //i site ostanati sliki
                 foreach (HttpPostedFileBase img in model.ImageUrls)
                 {
@@ -61,6 +66,12 @@ namespace _3D_Art_Portfolio.Controllers
                     img.SaveAs(path);
                     _context.Images.Add(new Image(temp.ProjectId, Path.Combine("~/UserUploads/", User.Identity.GetUserId(), temp.ProjectId.ToString(), image)));
                 }
+
+                //pri kreiranje na nov proekt site softveri od modelot gi stavame vo baza
+                foreach (int a in model.SoftwareUsedUrls)
+                    _context.ProjectSoftware.Add(new ProjectSoftware(temp.ProjectId, a));
+
+                //stavame timestamp i gi zacuvuvame site promeni vo bazata
                 temp.TimeStamp = DateTime.Now.ToString("MMMM d, yyyy h:mm tt");
                 _context.SaveChanges();
                 return RedirectToAction("ViewProject/"+ temp.ProjectId);
@@ -73,16 +84,19 @@ namespace _3D_Art_Portfolio.Controllers
             if (model == null)
                 return new HttpNotFoundResult();
             model.ImageUrls = _context.Images.Where(x => x.ProjectId == id).ToList();
+            var softwareId = _context.ProjectSoftware.Where(x => x.ProjectId == id).Select(x => x.SoftwareId).ToList();
+            model.SoftwareUsedUrls = _context.Softwares.Where(x => softwareId.Contains(x.Id)).ToList();
+            model.Likes = _context.Likes.Where(x => x.ProjectId == id).Count();
             return View(model);
         }
         public ActionResult DeleteProject(int id)
         {
             var project = _context.ProjectEntries.Find(id);
             if (User.Identity.GetUserId() != project.UserId && !User.IsInRole("Administrator"))
-                //nekoj drug korisnik probuva da izbrisi, ova da ne se dozvoli i vo drugi funkcii - potocno edit za drugi ne znnam dali ke treba
                 return Content("no permissions");
             if (project == null)
                 return new HttpNotFoundResult();
+            DeleteProject(project);
             return RedirectToAction("Index","Profile");
         }
         public void DeleteProject(ProjectEntry project)
@@ -94,9 +108,11 @@ namespace _3D_Art_Portfolio.Controllers
                 var projectFolder = Path.Combine(Server.MapPath("~/UserUploads/"), userId, id.ToString());
                 var images = _context.Images.Where(x => x.ProjectId == id);
                 var likes = _context.Likes.Where(x => x.ProjectId == id);
+                var software = _context.ProjectSoftware.Where(x => x.ProjectId == id);
                 _context.Images.RemoveRange(images);
                 _context.Likes.RemoveRange(likes);
                 _context.ProjectEntries.Remove(project);
+                _context.ProjectSoftware.RemoveRange(software);
                 _context.SaveChanges();
                 Directory.Delete(projectFolder, true);
             }  
@@ -109,7 +125,12 @@ namespace _3D_Art_Portfolio.Controllers
             if (User.Identity.GetUserId() != project.UserId)
                 return Content("no permissions");
             var images = _context.Images.Where(x => x.ProjectId == id).ToList();
-            var model = new EditProjectEntryViewModel(id,project.Name,project.Description,project.MainImage,images);
+
+            var softwareId = _context.ProjectSoftware.Where(x => x.ProjectId == id).Select(x => x.SoftwareId).ToList();
+            var allSoftware = new MultiSelectList(_context.Softwares.ToList(), "Id", "Name", softwareId);
+            var software = _context.Softwares.Where(x => softwareId.Contains(x.Id)).Select(x => x.Id).ToList();
+
+            var model = new EditProjectEntryViewModel(id,project.Name,project.Description,project.MainImage,images,allSoftware,software);
             return View(model);
         }
         [HttpPost]
@@ -148,6 +169,17 @@ namespace _3D_Art_Portfolio.Controllers
                     _context.Images.Add(new Image(model.ProjectId, pathInBase));
                 }
             }
+
+            //za softverite, prvo gi zemame postoeckite vo baza za toj proekt i gi brisime
+            var newSoftware = model.Software;
+            var currentSoftware = _context.ProjectSoftware.Where(x => x.ProjectId == model.ProjectId);
+            if(currentSoftware!=null)
+                _context.ProjectSoftware.RemoveRange(currentSoftware);
+            //a potoa site od modelot gi dodavame vo bazata
+            if(newSoftware!=null)
+                foreach (int a in newSoftware)
+                    _context.ProjectSoftware.Add(new ProjectSoftware(model.ProjectId, a));
+
             _context.SaveChanges();
             var id = model.ProjectId;
             return RedirectToAction("ViewProject/"+id);
@@ -186,6 +218,34 @@ namespace _3D_Art_Portfolio.Controllers
                 return Json(new { success = true, newImagePath = newPath }, JsonRequestBehavior.AllowGet);
             }
             return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult LikeProject(int id)
+        {
+            var project = _context.ProjectEntries.Find(id);
+            if(project!=null)
+            {
+                var userId = User.Identity.GetUserId();
+                var exists = _context.Likes.Where(x => x.UserId == userId &&x.ProjectId==project.ProjectId).SingleOrDefault();
+                if (exists == null)
+                    _context.Likes.Add(new Like(userId, project.ProjectId));
+                else
+                    _context.Likes.Remove(exists);
+                _context.SaveChanges();
+                var newCount = _context.Likes.Where(x => x.ProjectId == project.ProjectId).Count();
+                return Json(new { success = true, newCount =  newCount}, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult ViewLikes(int id)
+        {
+            var project = _context.ProjectEntries.Find(id);
+            if (project != null)
+            {
+                var userIds = _context.Likes.Where(x => x.ProjectId == id).Select(x=>x.UserId).ToList();
+                var users = _context.Users.Where(x => userIds.Contains(x.Id)).ToList();
+                return PartialView(users);
+            }
+            return new HttpNotFoundResult();
         }
 
     }

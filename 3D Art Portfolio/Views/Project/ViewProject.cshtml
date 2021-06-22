@@ -34,12 +34,9 @@
             @Html.DisplayFor(model => model.Description)
         </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Likes)
-        </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Likes)
+            <a id="viewLikes" class="btn btn-primary">Likes </a>
+            <p id="likesP">@Model.Likes</p>
         </dd>
 
         <dt>
@@ -54,10 +51,84 @@
         {
             <img class="otherImages" src=@Url.Content(i.Url) />
         }
-
+        </br>
+        <p>Software used:</p>
+        @foreach (Software s in Model.SoftwareUsedUrls)
+        {
+            <img class="otherImages" alt=@s.Name src=@Url.Content(s.ImageUrl) />
+        }
+        <a id="likeBtn" class="btn btn-primary">Like</a>
     </dl>
 </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.ProjectId }) |
+    @Html.ActionLink("Edit", "EditProject", new { id = Model.ProjectId }) |
     @Html.ActionLink("Back to Profile", "Index", "Profile")
 </p>
+
+
+<table class="viewLikesDiv" style="display:none">
+</table>
+    @section Scripts{
+        <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+        <script>
+        $(document).ready(function () {
+            $("#likeBtn").click(function () {
+                    $.ajax({
+                    type: "GET",
+                    url:"@String.Format(@"/Project/LikeProject/"+ @Model.ProjectId.ToString())",
+                    contentType: false,
+                    processData: false,
+                        success: function (results) {
+                        $("#likesP").html(results.newCount);
+                    },
+                    error: function (results) {
+                        console.log("error");
+                    }
+                }).done(function () {
+                }).fail(function (xhr, status, errorThrown) {
+                });
+            });
+        });
+        </script>
+        <script>
+            $(document).ready(function () {
+                $("#viewLikes").on("click", function (event) {
+                    var modal = bootbox.dialog({
+                        message: $(".viewLikesDiv").html(),
+                        title: "People who liked this project",
+                        buttons: [
+                            {
+                                label: "Close",
+                                className: "btn btn-default pull-left",
+                                callback: function () {
+                                    console.log("just do something on close");
+                                }
+                            }
+                        ],
+                        show: false,
+                        onEscape: function () {
+                            modal.modal("hide");
+                        }
+                    });
+                    modal.modal("show");
+                    var textToPass = @Model.ProjectId;
+                    $.ajax({
+                        type: "GET",
+                        url: '/Project/ViewLikes',
+                        data: jQuery.param({ id: textToPass }),
+                        contentType: false,
+                        processData: false,
+                        success: function (results) {
+                            $(".bootbox-body").html(results);
+                        },
+                        error: function (results) {
+                            console.log("error");
+                        }
+                    }).done(function () {
+                    }).fail(function (xhr, status, errorThrown) {
+                    });
+                });
+            });
+        </script>
+    }

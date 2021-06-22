@@ -16,12 +16,12 @@
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
         @Html.HiddenFor(model => model.ProjectId)
-        <img alt="@Model.Name" src=@Url.Content(Model.MainImage) id="mainImage" />
+        <img alt="@Model.Name" src=@Url.Content(Model.MainImage) id="mainImage" class="mainImages" />
 
         <div class="form-group">
             @Html.LabelFor(model => model.NewMainImage, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextBoxFor(model => model.NewMainImage, new { type = "file", htmlAttributes = new { @class = "form-control", @id="newMainImage" } })
+                @Html.TextBoxFor(model => model.NewMainImage, new { type = "file", htmlAttributes = new { @class = "form-control", @id = "newMainImage" } })
                 @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -60,6 +60,14 @@
             </div>
         </div>
 
+        <div class="form-group">
+            @Html.LabelFor(model => model.Software, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.ListBoxFor(model => model.Software, Model.AllSoftware, new { multiple = "multiple", htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Software, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
 
 
         <div class="form-group">
@@ -74,6 +82,8 @@
     @Html.ActionLink("Back to List", "Index")
 </div>
 @section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css" type="text/css" />
     <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
     <script>
         $(document).ready(function () {
@@ -96,7 +106,7 @@
                             $("#mainImage").attr("src", response.newImagePath);
                         }
                     },
-                    error: function(response) {
+                    error: function (response) {
                         console.log("error");
                     }
                 }).done(function () {
@@ -121,5 +131,10 @@
                 })
             });
         });
+    </script>
+    <script>
+            $(document).ready(function () {
+                $('#Software').multiselect();
+            });
     </script>
 }

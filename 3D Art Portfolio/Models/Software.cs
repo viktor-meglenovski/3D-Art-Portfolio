@@ -20,5 +20,9 @@ namespace _3D_Art_Portfolio.Models
             this.Name = Name;
             this.ImageUrl = ImageUrl;
         }
+        public override string ToString()
+        {
+            return Id.ToString();
+        }
     }
 }
