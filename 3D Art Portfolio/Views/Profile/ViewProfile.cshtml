@@ -1,41 +1,75 @@
 ﻿@model _3D_Art_Portfolio.ViewModels.ProfileViewModel
 @using _3D_Art_Portfolio.Models;
 @{
-    ViewBag.Title = Model.applicationUser.UserName;
+    ViewBag.Title = Model.applicationUser.UserName + "'s Profile";
 }
-<div style="background:blue" class="pull-left">
-    <h2>@Model.applicationUser.Name @Model.applicationUser.Surname</h2>
-    <img class="profilePicture" alt="Profile Picture" src=@Url.Content(Model.applicationUser.ProfilePicture) />
-    <h2>@@@Model.applicationUser.UserName</h2>
-</div>
-<div style="background:red">
-    <h2>My Art Projects</h2>
-    @if (Model.projectEntries.Count == 0)
-    {
-        <h2>No projects available :(</h2>
-    }
-    else
-    {
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Preview</th>
-                    <th>View Details</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (ProjectEntry pe in @Model.projectEntries)
+<div class="container">
+    <div class="row m-3 p-3">
+        <div class="col-lg-4 text-center font-monospace profileInfoContainter">
+            <div class="whiteBg roundedCorners">
+                <h2>@Model.applicationUser.Name @Model.applicationUser.Surname</h2>
+                <hr />
+                <img src="@Url.Content(Model.applicationUser.ProfilePicture)" class="profilePicture">
+                <hr />
+                <h2>@@@Model.applicationUser.UserName</h2>
+                <hr />
+                <h3>Total Projects: @Model.projectEntries.Count</h3>
+                <h3>Total Likes: @Model.TotalLikes</h3>
+            </div>
+        </div>
+        <div class="col-lg-8 font-monospace profileInfoContainter">
+            <div class="whiteBg roundedCorners">
+                <h2 class="text-center">@Model.applicationUser.UserName's 3D Art Projects</h2>
+                <hr />
+                @if (Model.projectEntries.Count == 0)
                 {
-                    <tr>
-                        <th>@pe.Name</th>
-                        <th><img class="profilePicture" alt=@pe.Name src=@Url.Content(pe.MainImage) /></th>
-                        <th><a href="/Project/ViewProject/@pe.ProjectId">View details</a></th>
-                    </tr>
+                    <h2>No projects available :(</h2>
                 }
-            </tbody>
-        </table>
-    }
+                else
+                {
+                    <div class="roundedCorners" style="margin-bottom:15px;">
+                        <table id="dataTable" class="row-border">
+                            <thead>
+                                <tr style="border-bottom:1px solid black" ; width:100%;>
+                                    <th style="width:20%">Name</th>
+                                    <th style="width:30%">Preview</th>
+                                    <th style="width:30%">Upload Time</th>
+                                    <th style="width:20%"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (ProjectEntry pe in @Model.projectEntries)
+                                {
+                                    <tr style="border-bottom:1px solid black">
+                                        <td>@pe.Name</td>
+                                        <td><img class="otherImagesWithRatio" alt=@pe.Name src=@Url.Content(pe.MainImage) /></td>
+                                        <td>@pe.TimeStamp</td>
+                                        <td><a href="/Project/ViewProject/@pe.ProjectId" class="btn btn-success btn-size">View details</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>
-
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("#dataTable").DataTable({
+                "columns": [
+                    { "name": "name", "orderable": true },
+                    { "name": "preview", "orderable": false },
+                    { "name": "timeStamp", "orderable": true },
+                    { "name": "detailsBtn", "orderable": false },
+                ],
+                "bLengthChange": false,
+                "searching": false,
+                "pageLength": 4,
+                "bInfo": false
+            });
+        });
+    </script>
+}

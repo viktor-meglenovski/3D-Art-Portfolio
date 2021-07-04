@@ -1,86 +1,81 @@
-﻿@model _3D_Art_Portfolio.Models.ProjectEntry
+﻿@model _3D_Art_Portfolio.ViewModels.ViewProjectViewModel
 @using _3D_Art_Portfolio.Models
+@using Microsoft.AspNet.Identity
 @{
-    ViewBag.Title = "ViewProject";
+    ViewBag.Title = Model.ProjectEntry.Name;
 }
+<div class="marginTop" style="width:100%;">
+    <div class="profileInfoContainter roundedCorners whiteBg " style="width:50%; margin:0 auto;padding-bottom:50px;">
+        <div class="text-center">
+            <h3 style="display:inline;">@Model.ProjectEntry.Name</h3>
+            <h5>@Model.ProjectEntry.TimeStamp</h5>
+            <hr />
+        </div>
+        <div>
+            <div class="col-lg-6">
+                <img class="mainImages thumbnail" alt="Main image" src=@Url.Content(Model.ProjectEntry.MainImage) />
+            </div>
+            <div class="col-lg-6">
+                <p>@Model.ProjectEntry.Description</p>
+            </div>
+        </div>
+        <hr />
+        <div>
+            @foreach (Image i in Model.ProjectEntry.ImageUrls)
+            {
+                <img class="otherImages thumbnail" src=@Url.Content(i.Url) />
+            }
+        </div>
+        <hr />
+        <div>
+            <h3>Software used:</h3>
+            @foreach (Software s in Model.ProjectEntry.SoftwareUsedUrls)
+            {
+                <img class="otherImages" alt=@s.Name src=@Url.Content(s.ImageUrl) />
+            }
+        </div>
+        <hr />
+        <div class="form-group">
+            <div class="col-lg-6 text-left">
 
-<h2>ViewProject</h2>
-
-<div>
-    <h4>ProjectEntry</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.TimeStamp)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.TimeStamp)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-
-        <dd>
-            <a id="viewLikes" class="btn btn-primary">Likes </a>
-            <p id="likesP">@Model.Likes</p>
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.MainImage)
-        </dt>
-        <dd>
-            <img class="mainImages" alt="Main image" src=@Url.Content(Model.MainImage) />
-        </dd>
-
-        <p>Other images:</p>
-        @foreach (Image i in Model.ImageUrls)
-        {
-            <img class="otherImages" src=@Url.Content(i.Url) />
-        }
-        </br>
-        <p>Software used:</p>
-        @foreach (Software s in Model.SoftwareUsedUrls)
-        {
-            <img class="otherImages" alt=@s.Name src=@Url.Content(s.ImageUrl) />
-        }
-        <a id="likeBtn" class="btn btn-primary">Like</a>
-    </dl>
+                @if (Model.ProjectEntry.UserId == User.Identity.GetUserId())
+                {
+                    <a href="/Project/EditProject/@Model.ProjectEntry.ProjectId" class="btn btn-primary">Edit Project</a>
+                }
+                <a href="/Profile/ViewProfile/@Model.ProjectEntry.UserId" class="btn btn-success">Back</a>
+            </div>
+            <div class="col-lg-6 text-right">
+                <a id="viewLikes" class="btn btn-danger text-center">Likes: @Model.ProjectEntry.Likes </a>
+                @{ var likeImg = Model.IsLiked == true ? "~/Content/Images/heart_full.png" : "~/Content/Images/heart_empty.png";}
+                <a id="likeBtn" class="btn btn-default" style="padding: 5px;"><img id="likeImage" style="width:30px; margin:0;" src=@Url.Content(likeImg) /></a>
+            </div>
+        </div>
+    </div>
 </div>
-<p>
-    @Html.ActionLink("Edit", "EditProject", new { id = Model.ProjectId }) |
-    @Html.ActionLink("Back to Profile", "Index", "Profile")
-</p>
 
 
 <table class="viewLikesDiv" style="display:none">
 </table>
-    @section Scripts{
-        <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+@section Scripts{
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
 
-        <script>
+    <script>
         $(document).ready(function () {
             $("#likeBtn").click(function () {
                     $.ajax({
                     type: "GET",
-                    url:"@String.Format(@"/Project/LikeProject/"+ @Model.ProjectId.ToString())",
+                    url:"@String.Format(@"/Project/LikeProject/"+ @Model.ProjectEntry.ProjectId.ToString())",
                     contentType: false,
                     processData: false,
                         success: function (results) {
-                        $("#likesP").html(results.newCount);
+                            $("#viewLikes").html("Likes: " + results.newCount);
+                            var likeImage = $("#likeImage");
+                            if (likeImage.attr("src").indexOf("full") > 0) {
+                                likeImage.attr("src", "/Content/Images/heart_empty.png")
+                            }
+                            else {
+                                likeImage.attr("src", "/Content/Images/heart_full.png")
+                            }
                     },
                     error: function (results) {
                         console.log("error");
@@ -90,19 +85,18 @@
                 });
             });
         });
-        </script>
-        <script>
+    </script>
+    <script>
             $(document).ready(function () {
                 $("#viewLikes").on("click", function (event) {
                     var modal = bootbox.dialog({
                         message: $(".viewLikesDiv").html(),
-                        title: "People who liked this project",
+                        title: "<h3>People who liked this project</h3>",
                         buttons: [
                             {
                                 label: "Close",
                                 className: "btn btn-default pull-left",
                                 callback: function () {
-                                    console.log("just do something on close");
                                 }
                             }
                         ],
@@ -112,7 +106,7 @@
                         }
                     });
                     modal.modal("show");
-                    var textToPass = @Model.ProjectId;
+                    var textToPass = @Model.ProjectEntry.ProjectId;
                     $.ajax({
                         type: "GET",
                         url: '/Project/ViewLikes',
@@ -121,6 +115,17 @@
                         processData: false,
                         success: function (results) {
                             $(".bootbox-body").html(results);
+                            $(".bootbox-body .tabela").DataTable({
+                                "columns": [
+                                    { "name": "profilePicture", "orderable": false },
+                                    { "name": "userName", "orderable": false }
+                                ],
+                                "ordering": false,
+                                "bLengthChange": false,
+                                "searching": false,
+                                "pageLength": 5,
+                                "bInfo": false
+                            });
                         },
                         error: function (results) {
                             console.log("error");
@@ -130,5 +135,5 @@
                     });
                 });
             });
-        </script>
-    }
+    </script>
+}

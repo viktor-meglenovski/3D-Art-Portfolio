@@ -69,7 +69,7 @@ namespace _3D_Art_Portfolio.Controllers
         }
         public void DeleteProject(ProjectEntry project)
         {
-            if (User.Identity.GetUserId() == project.UserId || User.IsInRole("Administrator"))
+            if (User.IsInRole("Administrator"))
             {
                 var id = project.ProjectId;
                 var userId = project.UserId;

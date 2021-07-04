@@ -32,7 +32,9 @@ namespace _3D_Art_Portfolio.Controllers
                 return RedirectToAction("AdministratorPanel", "Administrator");
             var user = _userManager.FindById(User.Identity.GetUserId());
             var projectEntries = _context.ProjectEntries.Where(x => x.UserId == user.Id).ToList();
-            var profileViewModel = new ProfileViewModel(user, projectEntries);
+            var projectEntryIds = _context.ProjectEntries.Where(x => x.UserId == user.Id).Select(x => x.ProjectId).ToList();
+            var likes = _context.Likes.Where(x => projectEntryIds.Contains(x.ProjectId)).Count();
+            var profileViewModel = new ProfileViewModel(user, projectEntries,likes);
             return View(profileViewModel);
         }
         public ActionResult EditProfile()
@@ -103,7 +105,9 @@ namespace _3D_Art_Portfolio.Controllers
                 return RedirectToAction("Index");
             var user = _context.Users.Find(id);
             var projectEntries = _context.ProjectEntries.Where(x => x.UserId == user.Id).ToList();
-            var profileViewModel = new ProfileViewModel(user, projectEntries);
+            var projectEntryIds = _context.ProjectEntries.Where(x => x.UserId == user.Id).Select(x => x.ProjectId).ToList();
+            var likes = _context.Likes.Where(x => projectEntryIds.Contains(x.ProjectId)).Count();
+            var profileViewModel = new ProfileViewModel(user, projectEntries, likes);
             return View(profileViewModel);
         }
         

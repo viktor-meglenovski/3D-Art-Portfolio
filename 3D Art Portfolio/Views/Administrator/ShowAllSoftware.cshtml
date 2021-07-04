@@ -1,31 +1,56 @@
 ﻿@model IEnumerable<_3D_Art_Portfolio.Models.Software>
 @using _3D_Art_Portfolio.Models
 @{
-    ViewBag.Title = "ShowAllSoftware";
+    ViewBag.Title = "Show All Software";
 }
 
-<h2>Show all software that is available for users to choose</h2>
-<a href="/Administrator/AddSoftware" class="btn btn-primary">Add new Software</a>
-<table>
-    <thead>
-        <tr>
-            <td>Software Name</td>
-            <td>Software Logo</td>
-            <td></td>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach(Software s in Model)
-        {
-        <tr>
-            <td>@s.Name</td>
-            <td><img class="otherImages"alt="@s.Name Logo", src="@Url.Content(s.ImageUrl)"/></td>
-            <td><a href=@String.Format("/Administrator/DeleteSoftware/"+s.Id)>Delete</a></td>
-        </tr>
-        }
-    </tbody>
-</table>
-<div>
-    @Html.ActionLink("Back to Administrator Panel", "AdministratorPanel")
+<div class="marginTop" style="width:100%;">
+    <div class="profileInfoContainter roundedCorners whiteBg" style="width:50%; margin:0 auto;">
+        <h2 class="text-center">Show all software that is available for users to choose</h2>
+        <hr style="margin:5px auto;"/>
+        <table style="width:100%;" class="tabela">
+            <thead>
+                <tr>
+                    <th style="width:40%;">Software Name</th>
+                    <th style="width:40%;">Software Logo</th>
+                    <th style="width:20%;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Software s in Model)
+                {
+                    <tr>
+                        <td>@s.Name</td>
+                        <td><img class="thumbnail otherImages" alt="@s.Name Logo" , src="@Url.Content(s.ImageUrl)" /></td>
+                        <td><a href=@String.Format("/Administrator/DeleteSoftware/"+s.Id) class="btn btn-danger">X</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <hr />
+        <div class="text-center">
+            <a style="width:250px; margin-right:10px;" href="/Administrator/AddSoftware" class="btn btn-success btn-lg">Add new Software</a>
+            <a style="width:250px; margin-left:10px;" href="/Administrator/AdministratorPanel" class="btn btn-primary btn-lg">Back to Administrator Panel</a>
+        </div>
+    </div>
 </div>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $(".tabela").DataTable({
+                "columns": [
+                    { "name": "name", "orderable": false },
+                    { "name": "picture", "orderable": false },
+                    { "name": "delete", "orderable": false }
+                ],
+                "ordering": false,
+                "bLengthChange": false,
+                "searching": false,
+                "pageLength": 5,
+                "bInfo": false
+            });
+            $("#newSearchPlace").html($(".dataTables_filter"));
+        });
+    </script>
+}
 

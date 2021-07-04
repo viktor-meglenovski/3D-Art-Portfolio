@@ -1,18 +1,18 @@
 ﻿@model IEnumerable<_3D_Art_Portfolio.Models.ApplicationUser>
-
-<table>
+<h4>Total Likes: @Model.Count()</h4>
+<table class="tabela" style="width:100%";>
     <thead>
         <tr>
-            <td>Profile Picture</td>
-            <td>Username</td>
+            <th>Profile Picture</th>
+            <th>User Name</th>
         </tr>
     </thead>
     <tbody>
         @foreach(var x in Model)
             {
                 <tr>
-                    <td>
-                        <img class="otherImages", alt="@x.UserName" src="@Url.Content(x.ProfilePicture)"/>
+                    <td style="width:50%">
+                        <img class="smallProfilePicture", alt="@x.UserName" src="@Url.Content(x.ProfilePicture)"/>
                     </td>
                     <td>
                         <a href=@String.Format("/Profile/ViewProfile/"+ @x.Id)>@@@x.UserName</a>

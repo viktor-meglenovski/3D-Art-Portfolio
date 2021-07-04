@@ -2,29 +2,58 @@
 @{
     ViewBag.Title = "Manage Users";
 }
-
-<h2>Manage Users</h2>
-
-<table>
-    <thead>
-        <tr>
-            <td>User Name</td>
-            <td></td>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach(var user in @Model)
-            {
+<div class="marginTop" style="width:100%;">
+    <div class="profileInfoContainter roundedCorners whiteBg" style="width:50%; margin:0 auto;">
+        <h2 class="text-center" style="margin-top:0;">Manage Users</h2>
+        <hr style="margin:5px auto 5px auto"/>
+        <div class="text-center" id="newSearchPlace" style="width:100%;display:inline;"></div>
+        <table class="tabela" style="width:100%">
+            <thead>
                 <tr>
-                    <td>@user.UserName</td>
-                    <td>
-                        <a href=@String.Format("/Administrator/DeleteUser?id="+ @user.Id) >Delete User</a>
-                    </td>
+                    <th style="width:40%">Profile Picture</th>
+                    <th style="width:40%">User Name</th>
+                    <th style="width:20%"></th>
                 </tr>
-            }
-    </tbody>
-</table>
-<div>
-    @Html.ActionLink("Back to Administrator Panel", "AdministratorPanel")
+            </thead>
+            <tbody>
+                @foreach (var user in @Model)
+                {
+                    <tr>
+                        <td>
+                            <img class="smallProfilePicture" src="@Url.Content(user.ProfilePicture)" />
+                        </td>
+                        <td>
+                            <a href=@String.Format("/Profile/ViewProfile/"+ @user.Id)>@user.UserName</a>
+                        </td>
+                        <td>
+                            <a class="btn btn-danger" href=@String.Format("/Administrator/DeleteUser?id="+ @user.Id)>X</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <hr />
+        <div class="text-center">
+            <a href="/Administrator/AdministratorPanel" class="btn btn-primary">Back to Administrator Panel</a>
+        </div>
+    </div>
 </div>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $(".tabela").DataTable({
+                "columns": [
+                    { "name": "profilePicture", "orderable": false },
+                    { "name": "userName", "orderable": false },
+                    { "name": "delete", "orderable": false }
+                ],
+                "ordering": false,
+                "bLengthChange": false,
+                "pageLength": 5,
+                "bInfo": false
+            });
+            $("#newSearchPlace").html($(".dataTables_filter"));
+        });
+    </script>    
+}
 

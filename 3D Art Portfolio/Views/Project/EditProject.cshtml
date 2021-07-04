@@ -1,85 +1,86 @@
 ﻿@model _3D_Art_Portfolio.ViewModels.EditProjectEntryViewModel
 @using _3D_Art_Portfolio.Models
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "Edit Project";
 }
 
-<h2>Edit</h2>
+<div class="marginTop" style="width:100%;">
+    <div class="profileInfoContainter roundedCorners whiteBg text-center" style="width:70%; margin:0 auto;">
+        <h2>Edit Project</h2>
 
-@using (Html.BeginForm("EditProject", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
-{
-    @Html.AntiForgeryToken()
+        @using (Html.BeginForm("EditProject", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
 
-    <div class="form-horizontal">
-        <h4>EditProjectEntryViewModel</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-horizontal">
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-        @Html.HiddenFor(model => model.ProjectId)
-        <img alt="@Model.Name" src=@Url.Content(Model.MainImage) id="mainImage" class="mainImages" />
+                @Html.HiddenFor(model => model.ProjectId)
+                <div style="width:50%; margin:0 auto;">
+                    <img alt="@Model.Name" src=@Url.Content(Model.MainImage) id="mainImage" class="mainImages thumbnail" />
+                </div>
+                <div class="form-group">
+                    @Html.Label("Upload a new Main Image", htmlAttributes: new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(model => model.NewMainImage, htmlAttributes: new { @class = "custom-file-input", @id="newMainImage", type = "file" })
+                        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                    </div>
+                </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.NewMainImage, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.NewMainImage, new { type = "file", htmlAttributes = new { @class = "form-control", @id = "newMainImage" } })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @foreach (Image i in Model.Images)
+                    {
+                        <span>
+                            <img class="@i.Id otherImages" src=@Url.Content(i.Url) />
+                            <button type="button" deleteId="@i.Id" class="imageDelete btn btn-danger">X</button>
+                        </span>
+                    }
+                </div>
+                <div class="form-group">
+                    @Html.Label("Upload more images", htmlAttributes: new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(model => model.NewImageUrls, htmlAttributes: new { @class = "custom-file-input", @id = "newMainImage", type = "file", multiple="multiple" })
+                        @Html.ValidationMessageFor(model => model.NewImageUrls, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Software, htmlAttributes: new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.ListBoxFor(model => model.Software, Model.AllSoftware, new { multiple = "multiple", htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Software, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <hr/>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input type="submit" value="Save" class="btn btn-success btn-lg" />
+                    </div>
+                </div>
             </div>
-        </div>
+        }
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            <p>Other images:</p>
-            @foreach (Image i in Model.Images)
-            {
-                <span>
-                    <img class="@i.Id otherImages" src=@Url.Content(i.Url) />
-                    <button type="button" deleteId="@i.Id" class="imageDelete">Delete Image</button>
-                </span>
-            }
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(model => model.NewImageUrls, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.NewImageUrls, new { type = "file", multiple = "multiple", htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.NewImageUrls, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Software, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.ListBoxFor(model => model.Software, Model.AllSoftware, new { multiple = "multiple", htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Software, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
+        <div>
+            <a href="/Profile/Index" class="btn btn-primary btn-lg">Back to profile</a>
         </div>
     </div>
-}
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
 </div>
 @section Scripts{
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
@@ -133,8 +134,8 @@
         });
     </script>
     <script>
-            $(document).ready(function () {
-                $('#Software').multiselect();
-            });
+        $(document).ready(function () {
+            $('#Software').multiselect();
+        });
     </script>
 }

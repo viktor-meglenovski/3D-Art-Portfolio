@@ -3,113 +3,99 @@
 @{
     ViewBag.Title = "My Profile";
 }
-<div style="background:blue" class="pull-left">
-    <h2>@Model.applicationUser.Name @Model.applicationUser.Surname</h2>
-    <img class="profilePicture" alt="Profile Picture" src=@Url.Content(Model.applicationUser.ProfilePicture) />
-    <h2>@@@Model.applicationUser.UserName</h2>
-    <a href="/Profile/EditProfile" class="btn btn-primary">Edit Profile</a>
-</div>
-<div style="background:red">
-    <h2>My Art Projects</h2>
-    @if (Model.projectEntries.Count == 0)
-    {
-        <h2>No projects available</h2>
-    }
-    else
-    {
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Preview</th>
-                    <th>View Details</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (ProjectEntry pe in @Model.projectEntries)
+<div class="container">
+    <div class="row m-3 p-3">
+        <div class="col-lg-4 text-center font-monospace profileInfoContainter">
+            <div class="whiteBg roundedCorners">
+                <h2>@Model.applicationUser.Name @Model.applicationUser.Surname</h2>
+                <hr />
+                <img src="@Url.Content(Model.applicationUser.ProfilePicture)" class="profilePicture">
+                <hr />
+                <h2>@@@Model.applicationUser.UserName</h2>
+                <hr />
+                <h3>Total Projects: @Model.projectEntries.Count</h3>
+                <h3>Total Likes: @Model.TotalLikes</h3>
+                <hr />
+                <a href="/Profile/EditProfile" class="btn btn-primary btn-lg">Edit Profile</a>
+            </div>
+        </div>
+        <div class="col-lg-8 font-monospace profileInfoContainter">
+            <div class="whiteBg roundedCorners">
+                <h2 class="text-center">My 3D Art Projects</h2>
+                <hr />
+                @if (Model.projectEntries.Count == 0)
                 {
-                    <tr>
-                        <th>@pe.Name</th>
-                        <th><img class="profilePicture" alt=@pe.Name src=@Url.Content(pe.MainImage) /></th>
-                        <th><a href="/Project/ViewProject/@pe.ProjectId">View details</a></th>
-                        <th><a href="/Project/EditProject/@pe.ProjectId" class="btn btn-primary">EDIT</a> <a href="/Project/DeleteProject/@pe.ProjectId" class="btn btn-primary"> DELETE</a></th>
-                    </tr>
+                    <h2>No projects available :(</h2>
                 }
-            </tbody>
-        </table>
-    }
-
-    <a href="/Project/AddNewProject" class="btn btn-primary">Add new Project</a>
-</div>
-
-<button type="button" id="search" class="btn btn-primary">Search</button>
-<div id="searchForm" style="display:none">
-    <input type="text" placeholder="Search" class="searchText" />
-    <table id="table">
-        <thead>
-            <tr>
-                <td></td>
-                <td>User Name</td>
-            </tr>
-        </thead>
-        <tbody class="tableBody">
-        </tbody>
-    </table>
+                else
+                {
+                    <div class="roundedCorners" style="margin-bottom:15px;">
+                        <table id="dataTable" class="row-border">
+                            <thead>
+                                <tr style="border-bottom:1px solid black" ; width:100%;>
+                                    <th style="width:15%">Name</th>
+                                    <th style="width:20%">Preview</th>
+                                    <th style="width:25%">Upload Time</th>
+                                    <th style="width:20%"></th>
+                                    <th style="width:20%"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (ProjectEntry pe in @Model.projectEntries)
+                                {
+                                    <tr style="border-bottom:1px solid black">
+                                        <td>@pe.Name</td>
+                                        <td><img class="otherImagesWithRatio" alt=@pe.Name src=@Url.Content(pe.MainImage) /></td>
+                                        <td>@pe.TimeStamp</td>
+                                        <td><a href="/Project/ViewProject/@pe.ProjectId" class="btn btn-success btn-size">View details</a></td>
+                                        <td><a href="/Project/EditProject/@pe.ProjectId" class="btn btn-primary btn-size">Edit</a> <a imgUrl=@pe.MainImage projectName=@pe.Name path="/Project/DeleteProject/@pe.ProjectId" class="btn btn-danger btn-size deleteButton">Delete</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                <a href="/Project/AddNewProject" class="btn btn-primary">Add a new Project</a>
+            </div>
+        </div>
+    </div>
 </div>
 @section Scripts{
     <script>
         $(document).ready(function () {
-            $("#search").on("click", function (event) {
-                var modal = bootbox.dialog({
-                    message: $("#searchForm").html(),
-                    title: "Search",
-                    buttons: [
-                        {
-                            label: "Close",
-                            className: "btn btn-default pull-left",
-                            callback: function () {
-                                console.log("just do something on close");
-                            }
+            $(".deleteButton").click(function () {
+                var link = $(this);
+                bootbox.confirm({
+                    title: "<h4>Are you sure that you want to delete the following project?</h4>",
+                    message: "<h3>"+link.attr('projectName'),
+                    callback: function (result) {
+                        if (result) {
+                            window.location.href = link.attr('path');
                         }
-                    ],
-                    show: false,
-                    onEscape: function () {
-                        modal.modal("hide");
                     }
-                });
-                modal.modal("show");
-                $(".modal .searchText").keyup(function () {
-                    var textToPass = $(".modal .searchText").val();
-                    console.log("tuka")
-                    console.log(textToPass);
-                    $.ajax({
-                        type: "GET",
-                        url: '/Profile/Search',
-                        data: jQuery.param({ text: textToPass }),
-                        contentType: false,
-                        processData: false,
-                        success: function (results) {
-                            console.log(results);
-                            $(".modal .tableBody").html(results);
-                        },
-                        error: function (results) {
-                            console.log("error");
-                        }
-                    }).done(function () {
-                    }).fail(function (xhr, status, errorThrown) {
-                    });
                 });
             });
         });
     </script>
     <script>
         $(document).ready(function () {
-           
-        })
-    </script>
-
+            $("#dataTable").DataTable({
+                "columns": [
+                    { "name": "name", "orderable": true },
+                    { "name": "preview", "orderable": false },
+                    { "name": "timestamp", "orderable": true },
+                    { "name": "detailsBtn", "orderable": false },
+                    { "name": "editDeleteBtn", "orderable": false }
+                ],
+                "bLengthChange": false,
+                "searching": false,
+                "pageLength": 4,
+                "bInfo": false
+            });
+        });
+    </script>    
 }
+
 
 
 

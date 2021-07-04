@@ -6,7 +6,8 @@
     <title>@ViewBag.Title</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
-
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css">
+    <script src="https://cdn.zinggrid.com/zinggrid.min.js"></script>
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -21,9 +22,8 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                    <li>@Html.ActionLink("My Profile", "Index", "Profile")</li>
+                    <li><button style="padding:15px" type="button" id="search" class="btn btn-link"><i class="fa fa-lg fa-search"></i></button></li>
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
@@ -31,14 +31,73 @@
     </div>
     <div class="container body-content">
         @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - 3D Art Portfolio</p>
-        </footer>
     </div>
 
+    <div id="searchForm" style="display:none">
+        <div style="margin:0 auto 20px auto; padding:0px; width:max-content;" class="form-group rounded-pill">
+            <input style="width:max-content" class="form-control searchText rounded-pill" type="search" placeholder="search">
+        </div>
+        <div class="searchTarget"></div>
+    </div>
+
+    
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
+    <script>
+        $(document).ready(function () {
+            $("#search").on("click", function (event) {
+                var modal = bootbox.dialog({
+                    message: $("#searchForm").html(),
+                    title: "<h3>Search by user name</h3>",
+                    buttons: [
+                        {
+                            label: "Close",
+                            className: "btn btn-default pull-left",
+                            callback: function () {
+                                console.log("just do something on close");
+                            }
+                        }
+                    ],
+                    show: false,
+                    onEscape: function () {
+                        modal.modal("hide");
+                    }
+                });
+                modal.modal("show");
+                $(".modal .searchText").keyup(function () {
+                    var textToPass = $(".modal .searchText").val();
+                    $.ajax({
+                        type: "GET",
+                        url: '/Profile/Search',
+                        data: jQuery.param({ text: textToPass }),
+                        contentType: false,
+                        processData: false,
+                        success: function (results) {
+                            $(".modal .searchTarget").html(results);
+                            $(".modal .searchTarget .tabela").DataTable({
+                                "columns": [
+                                    { "name": "profilePicture", "orderable": false },
+                                    { "name": "userName", "orderable": false }
+                                ],
+                                "ordering": false,
+                                "bLengthChange": false,
+                                "searching": false,
+                                "pageLength": 5,
+                                "bInfo": false
+                            });
+                        },
+                        error: function (results) {
+                            console.log("error");
+                        }
+                    }).done(function () {
+                    }).fail(function (xhr, status, errorThrown) {
+                    });
+                });
+            });
+        });
+    </script>
+
 </body>
 </html>
+
