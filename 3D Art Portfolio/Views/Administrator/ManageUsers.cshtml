@@ -5,7 +5,7 @@
 <div class="marginTop" style="width:100%;">
     <div class="profileInfoContainter roundedCorners whiteBg" style="width:50%; margin:0 auto;">
         <h2 class="text-center" style="margin-top:0;">Manage Users</h2>
-        <hr style="margin:5px auto 5px auto"/>
+        <hr style="margin:5px auto 5px auto" />
         <div class="text-center" id="newSearchPlace" style="width:100%;display:inline;"></div>
         <table class="tabela" style="width:100%">
             <thead>
@@ -20,13 +20,13 @@
                 {
                     <tr>
                         <td>
-                            <img class="smallProfilePicture" src="@Url.Content(user.ProfilePicture)" />
+                            <img class="smallProfilePicture zoomInImages" src="@Url.Content(user.ProfilePicture)" />
                         </td>
                         <td>
-                            <a href=@String.Format("/Profile/ViewProfile/"+ @user.Id)>@user.UserName</a>
+                            <h4><a href=@String.Format("/Profile/ViewProfile/"+ @user.Id)>@@@user.UserName</a></h4>
                         </td>
                         <td>
-                            <a class="btn btn-danger" href=@String.Format("/Administrator/DeleteUser?id="+ @user.Id)>X</a>
+                            <a visit=@String.Format("/Profile/ViewProfile/"+ @user.Id) imgPath="@Url.Content(user.ProfilePicture)" userName=@user.UserName class="btn btn-danger deleteButton" path=@String.Format("/Administrator/DeleteUser?id="+ @user.Id)>X</a>
                         </td>
                     </tr>
                 }
@@ -34,7 +34,7 @@
         </table>
         <hr />
         <div class="text-center">
-            <a href="/Administrator/AdministratorPanel" class="btn btn-primary">Back to Administrator Panel</a>
+            <a href="/Administrator/AdministratorPanel" class="btn btn-primary btn-lg">Back to Administrator Panel</a>
         </div>
     </div>
 </div>
@@ -54,6 +54,22 @@
             });
             $("#newSearchPlace").html($(".dataTables_filter"));
         });
-    </script>    
+    </script>
+    <script>
+        $(document).ready(function () {
+            $(".deleteButton").click(function () {
+                var link = $(this);
+                bootbox.confirm({
+                    title: "<h4>Are you sure that you want to delete the following user?</h4>",
+                    message: "<img style='display:inline; margin-right:50px;' class='smallProfilePicture' src=" + link.attr("imgPath") + ">" + "<h3 style='display:inline;'><a href=" +link.attr("visit")+">@@" + link.attr('userName')+"</a></h3>",
+                    callback: function (result) {
+                        if (result) {
+                            window.location.href = link.attr('path');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 }
 

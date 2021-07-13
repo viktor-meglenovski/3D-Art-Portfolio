@@ -9,7 +9,7 @@
             <div class="whiteBg roundedCorners">
                 <h2>@Model.applicationUser.Name @Model.applicationUser.Surname</h2>
                 <hr />
-                <img src="@Url.Content(Model.applicationUser.ProfilePicture)" class="profilePicture">
+                <img src="@Url.Content(Model.applicationUser.ProfilePicture)" class="profilePicture zoomInImages">
                 <hr />
                 <h2>@@@Model.applicationUser.UserName</h2>
                 <hr />
@@ -42,9 +42,14 @@
                                 {
                                     <tr style="border-bottom:1px solid black">
                                         <td>@pe.Name</td>
-                                        <td><img class="otherImagesWithRatio" alt=@pe.Name src=@Url.Content(pe.MainImage) /></td>
+                                        <td><img class="otherImagesWithRatio zoomInImages" alt=@pe.Name src=@Url.Content(pe.MainImage) style="border:1px solid #d3d3d3; border-radius:10%;"/></td>
                                         <td>@pe.TimeStamp</td>
-                                        <td><a href="/Project/ViewProject/@pe.ProjectId" class="btn btn-success btn-size">View details</a></td>
+                                        <td>
+                                            @if (!User.IsInRole("Administrator"))
+                                            {
+                                                <a href="/Project/ViewProject/@pe.ProjectId" class="btn btn-success btn-size">View details</a>
+                                            }
+                                        </td>
                                     </tr>
                                 }
                             </tbody>

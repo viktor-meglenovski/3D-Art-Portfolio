@@ -11,7 +11,7 @@ using System.Web.Mvc;
 
 namespace _3D_Art_Portfolio.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    [HandleError]
     public class AdministratorController : Controller
     {
         protected ApplicationDbContext _context { get; set; }
@@ -28,10 +28,14 @@ namespace _3D_Art_Portfolio.Controllers
         }
         public ActionResult AdministratorPanel()
         {
+            if (!User.IsInRole("Administrator"))
+                return View("~/Views/Project/NoPermissions.cshtml");
             return View();
         }
         public ActionResult CleanTemp()
         {
+            if (!User.IsInRole("Administrator"))
+                return View("~/Views/Project/NoPermissions.cshtml");
             var path = Server.MapPath("~/UserUploads/Temp");
             Directory.Delete(path, true);
             Directory.CreateDirectory(path);
@@ -39,8 +43,9 @@ namespace _3D_Art_Portfolio.Controllers
         }
         public ActionResult ManageUsers()
         {
-            //var users = _context.Roles.Where(x => x.Name == "User").Select(x => x.Users).ToList();
-            var users = _context.Users.ToList();//ova ke go koristam za da gi izbrisam starite akaunti
+            if (!User.IsInRole("Administrator"))
+                return View("~/Views/Project/NoPermissions.cshtml");
+            var users = _context.Users.ToList();
             var model = new List<ApplicationUser>();
             foreach (ApplicationUser a in users)
                 if (!_userManager.IsInRole(a.Id, "Administrator"))
@@ -49,8 +54,10 @@ namespace _3D_Art_Portfolio.Controllers
         }
         public ActionResult DeleteUser(string id)
         {
+            if (!User.IsInRole("Administrator"))
+                return View("~/Views/Project/NoPermissions.cshtml");
             if (_userManager.IsInRole(id, "Administrator"))
-                return Content("You cannot delete administrator accounts");
+                return View("~/Views/Project/NoPermissions.cshtml");
             var user = _context.Users.Find(id);
             //se povikuva brisenje na site proekti ne korisnikot (so toa se brisat stavkite od Images, Likes(za konkretniot proekt) i ProjectEntries)
             var projects = _context.ProjectEntries.Where(x => x.UserId == user.Id).ToList();
@@ -86,17 +93,23 @@ namespace _3D_Art_Portfolio.Controllers
         //add i delete na novi softveri ova go pravi samo administratorot
         public ActionResult ShowAllSoftware()
         {
+            if (!User.IsInRole("Administrator"))
+                return View("~/Views/Project/NoPermissions.cshtml");
             var model=_context.Softwares.ToList();
             return View(model);
         }
         public ActionResult AddSoftware()
         {
+            if (!User.IsInRole("Administrator"))
+                return View("~/Views/Project/NoPermissions.cshtml");
             var model = new AddSoftwareViewModel();
             return View(model);
         }
         [HttpPost]
         public ActionResult AddSoftware(AddSoftwareViewModel model)
         {
+            if (!User.IsInRole("Administrator"))
+                return View("~/Views/Project/NoPermissions.cshtml");
             if (!ModelState.IsValid)
                 return View(model);
             var filename = Path.GetFileName(model.ImageUrl.FileName);
@@ -108,14 +121,22 @@ namespace _3D_Art_Portfolio.Controllers
         }
         public ActionResult DeleteSoftware(int id)
         {
+            if (!User.IsInRole("Administrator"))
+                return View("~/Views/Project/NoPermissions.cshtml");
             var toDelete = _context.Softwares.Find(id);
             if (toDelete == null)
                 return new HttpNotFoundResult();
             var pathToDelete = Path.Combine(Server.MapPath(toDelete.ImageUrl));
             System.IO.File.Delete(pathToDelete);
             _context.Softwares.Remove(toDelete);
+            var temp = _context.ProjectSoftware.Where(x => x.SoftwareId == id).ToList();
+            _context.ProjectSoftware.RemoveRange(temp);
             _context.SaveChanges();
             return RedirectToAction("ShowAllSoftware");
+        }
+        public ActionResult NoPermissionsAdministrator()
+        {
+            return View();
         }
     }
 }

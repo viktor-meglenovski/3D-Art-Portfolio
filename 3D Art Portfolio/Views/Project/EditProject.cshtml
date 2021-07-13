@@ -23,7 +23,7 @@
                 <div class="form-group">
                     @Html.Label("Upload a new Main Image", htmlAttributes: new { @class = "control-label col-md-4" })
                     <div class="col-md-8">
-                        @Html.TextBoxFor(model => model.NewMainImage, htmlAttributes: new { @class = "custom-file-input", @id="newMainImage", type = "file" })
+                        @Html.TextBoxFor(model => model.NewMainImage, htmlAttributes: new { @class = "custom-file-input", @id = "newMainImage", type = "file" })
                         @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -47,39 +47,43 @@
                 <div class="form-group">
                     @foreach (Image i in Model.Images)
                     {
-                        <span>
-                            <img class="@i.Id otherImages" src=@Url.Content(i.Url) />
-                            <button type="button" deleteId="@i.Id" class="imageDelete btn btn-danger">X</button>
-                        </span>
+                        <div class="par" style="position:relative; display:inline-block; ">
+                            <img class="@i.Id otherImages" src=@Url.Content(i.Url) style="border:1px solid #d3d3d3;border-radius:10%; margin-bottom:5px;" />
+                            <button type="button" deleteId="@i.Id" class="imageDelete btn btn-danger" style="position: absolute; bottom:5px; right:5px; border-radius: 30%;">X</button>
+                        </div>
                     }
                 </div>
                 <div class="form-group">
                     @Html.Label("Upload more images", htmlAttributes: new { @class = "control-label col-md-4" })
                     <div class="col-md-8">
-                        @Html.TextBoxFor(model => model.NewImageUrls, htmlAttributes: new { @class = "custom-file-input", @id = "newMainImage", type = "file", multiple="multiple" })
+                        @Html.TextBoxFor(model => model.NewImageUrls, htmlAttributes: new { @class = "custom-file-input", @id = "newImageUrls", type = "file", multiple = "multiple" })
                         @Html.ValidationMessageFor(model => model.NewImageUrls, "", new { @class = "text-danger" })
                     </div>
                 </div>
 
                 <div class="form-group">
                     @Html.LabelFor(model => model.Software, htmlAttributes: new { @class = "control-label col-md-4" })
-                    <div class="col-md-8">
+                    <div class="col-md-8 text-left">
                         @Html.ListBoxFor(model => model.Software, Model.AllSoftware, new { multiple = "multiple", htmlAttributes = new { @class = "form-control" } })
                         @Html.ValidationMessageFor(model => model.Software, "", new { @class = "text-danger" })
                     </div>
                 </div>
-                <hr/>
+                <hr />
                 <div class="form-group">
-                    <div class="col-md-12">
-                        <input type="submit" value="Save" class="btn btn-success btn-lg" />
+                    <div class="col-md-4">
+                        <a href="/Profile/Index" class="btn btn-primary btn-lg" style="width:150px;">Back to profile</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/Project/ViewProject/@Model.ProjectId" class="btn btn-danger btn-lg" style="width:150px;">Cancel</a>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="submit" value="Save" class="btn btn-success btn-lg" style="width:150px;" />
                     </div>
                 </div>
             </div>
         }
 
-        <div>
-            <a href="/Profile/Index" class="btn btn-primary btn-lg">Back to profile</a>
-        </div>
+        
     </div>
 </div>
 @section Scripts{
@@ -124,7 +128,7 @@
                     method: "GET",
                     url: "/Project/DeleteImage/" + link.attr("deleteId"),
                     success: function () {
-                        link.parents("span").remove().draw();
+                        link.parents("div .par").remove().draw();
                     },
                     error: function (response) {
                         console.log("error");

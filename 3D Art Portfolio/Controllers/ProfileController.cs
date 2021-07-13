@@ -12,6 +12,7 @@ using System.IO;
 namespace _3D_Art_Portfolio.Controllers
 {
     [Authorize]
+    [HandleError]
     public class ProfileController : Controller
     {
         protected ApplicationDbContext _context { get; set; }
@@ -96,11 +97,17 @@ namespace _3D_Art_Portfolio.Controllers
         }
         public ActionResult Search(string text)
         {
-            var model = _context.Users.Where(x => x.UserName.ToLower().Contains(text.ToLower())).ToList();
+            var temp = _context.Users.Where(x => x.UserName.ToLower().Contains(text.ToLower())).ToList();
+            var model = new List<ApplicationUser>();
+            foreach (ApplicationUser a in temp)
+                if (!_userManager.IsInRole(a.Id, "Administrator"))
+                    model.Add(a);
             return PartialView(model);
         }
         public ActionResult ViewProfile(string id)
         {
+            if (_userManager.IsInRole(id, "Administrator"))
+                return View("~/Views/Project/NoPermissions.cshtml");
             if (User.Identity.GetUserId() == id)
                 return RedirectToAction("Index");
             var user = _context.Users.Find(id);

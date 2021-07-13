@@ -11,6 +11,7 @@ using _3D_Art_Portfolio.Models;
 namespace _3D_Art_Portfolio.Controllers
 {
     [Authorize]
+    [HandleError]
     public class ManageController : Controller
     {
         private ApplicationSignInManager _signInManager;

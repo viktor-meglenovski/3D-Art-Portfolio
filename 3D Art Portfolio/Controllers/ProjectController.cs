@@ -13,6 +13,7 @@ using System.Web.Mvc;
 namespace _3D_Art_Portfolio.Controllers
 {
     [Authorize]
+    [HandleError]
     public class ProjectController : Controller
     {
         protected ApplicationDbContext _context { get; set; }
@@ -34,7 +35,7 @@ namespace _3D_Art_Portfolio.Controllers
         public ActionResult AddNewProject()
         {
             if (User.IsInRole("Administrator"))
-                return Content("admins cannot make projects");
+                return View("~/Views/Administrator/NoPermissionsAdministrator.cshtml");
             var model = new ProjectEntryViewModel();
             model.AllSoftware = new SelectList(_context.Softwares.ToList(),"Id","Name");
             return View(model);
@@ -43,8 +44,8 @@ namespace _3D_Art_Portfolio.Controllers
         public ActionResult AddNewProject(ProjectEntryViewModel model)
         {
             if (User.IsInRole("Administrator"))
-                return Content("admins cannot make projects");
-            if(ModelState.IsValid)
+                return View("~/Views/Administrator/NoPermissionsAdministrator.cshtml");
+            if (ModelState.IsValid)
             {
                 //pravime soodveten objekt i go zacuvuvame vo baza so cel da dobieme ID za nego
                 ProjectEntry temp = new ProjectEntry() { 
@@ -91,6 +92,8 @@ namespace _3D_Art_Portfolio.Controllers
         }
         public ActionResult ViewProject(int id)
         {
+            if (User.IsInRole("Administrator"))
+                return View("~/Views/Administrator/NoPermissionsAdministrator.cshtml");
             var model = _context.ProjectEntries.Find(id);
             if (model == null)
                 return new HttpNotFoundResult();
@@ -104,9 +107,11 @@ namespace _3D_Art_Portfolio.Controllers
         }
         public ActionResult DeleteProject(int id)
         {
+            if (User.IsInRole("Administrator"))
+                return View("~/Views/Administrator/NoPermissionsAdministrator.cshtml");
             var project = _context.ProjectEntries.Find(id);
             if (User.Identity.GetUserId() != project.UserId)
-                return Content("no permissions");
+                return View("NoPermissions");
             if (project == null)
                 return new HttpNotFoundResult();
             DeleteProject(project);
@@ -131,12 +136,14 @@ namespace _3D_Art_Portfolio.Controllers
             }  
         }
         public ActionResult EditProject(int id)
-        { 
+        {
+            if (User.IsInRole("Administrator"))
+                return View("~/Views/Administrator/NoPermissionsAdministrator.cshtml");
             var project = _context.ProjectEntries.Find(id);
             if (project == null)
                 return new HttpNotFoundResult();
             if (User.Identity.GetUserId() != project.UserId)
-                return Content("no permissions");
+                return View("NoPermissions");
             var images = _context.Images.Where(x => x.ProjectId == id).ToList();
 
             var softwareId = _context.ProjectSoftware.Where(x => x.ProjectId == id).Select(x => x.SoftwareId).ToList();
@@ -149,13 +156,15 @@ namespace _3D_Art_Portfolio.Controllers
         [HttpPost]
         public ActionResult EditProject(EditProjectEntryViewModel model)
         {
-            if(!ModelState.IsValid)
+            if (User.IsInRole("Administrator"))
+                return View("~/Views/Administrator/NoPermissionsAdministrator.cshtml");
+            if (!ModelState.IsValid)
                 return View(model);
             var toUpdate = _context.ProjectEntries.Find(model.ProjectId);
             if (toUpdate == null)
                 return new HttpNotFoundResult();
             if (User.Identity.GetUserId() != toUpdate.UserId)
-                return Content("no permissions");
+                return View("NoPermissions");
 
             toUpdate.Name = model.Name;
             toUpdate.Description = model.Description;
@@ -200,14 +209,16 @@ namespace _3D_Art_Portfolio.Controllers
         //funkcija so ajax za brisenje na sliki od proektot
         public ActionResult DeleteImage(int id)
         {
+            if (User.IsInRole("Administrator"))
+                return View("~/Views/Administrator/NoPermissionsAdministrator.cshtml");
             var toDelete = _context.Images.Find(id);
             if (toDelete!=null)
             {
                 var project = _context.ProjectEntries.Find(toDelete.ProjectId);
 
                 if (project.UserId != User.Identity.GetUserId())
-                    return Content("no permissions");
-                    //return Json(false, JsonRequestBehavior.AllowGet); //nema permisii da brisi drug
+                    return View("NoPermissions");
+                //return Json(false, JsonRequestBehavior.AllowGet); //nema permisii da brisi drug
 
                 var filename = Path.Combine(Server.MapPath("~/UserUploads/"), User.Identity.GetUserId(),project.ProjectId.ToString(), id.ToString());
                 System.IO.File.Delete(filename);
@@ -221,6 +232,8 @@ namespace _3D_Art_Portfolio.Controllers
         [HttpPost]
         public ActionResult ChangeMainImage()
         {
+            if (User.IsInRole("Administrator"))
+                return View("~/Views/Administrator/NoPermissionsAdministrator.cshtml");
             //funkcija so ajax za stavanje na nova main slika na proektot, vednas se prikazuva, ako ne se klikni Save ne se zacuvuva vo baza ova
             if (Request.Files.Count != 0)
             {
@@ -235,6 +248,8 @@ namespace _3D_Art_Portfolio.Controllers
         }
         public ActionResult LikeProject(int id)
         {
+            if (User.IsInRole("Administrator"))
+                return View("~/Views/Administrator/NoPermissionsAdministrator.cshtml");
             LikeLock.WaitOne();
             var project = _context.ProjectEntries.Find(id);
             if(project!=null)
@@ -255,6 +270,8 @@ namespace _3D_Art_Portfolio.Controllers
         }
         public ActionResult ViewLikes(int id)
         {
+            if (User.IsInRole("Administrator"))
+                return View("~/Views/Administrator/NoPermissionsAdministrator.cshtml");
             var project = _context.ProjectEntries.Find(id);
             if (project != null)
             {

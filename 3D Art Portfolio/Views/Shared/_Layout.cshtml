@@ -23,7 +23,11 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("My Profile", "Index", "Profile")</li>
-                    <li><button style="padding:15px" type="button" id="search" class="btn btn-link"><i class="fa fa-lg fa-search"></i></button></li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li><button style="padding:15px" type="button" id="search" class="btn btn-link"><i class="fa fa-lg fa-search"></i></button></li>
+                    }
+
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
@@ -37,13 +41,36 @@
         <div style="margin:0 auto 20px auto; padding:0px; width:max-content;" class="form-group rounded-pill">
             <input style="width:max-content" class="form-control searchText rounded-pill" type="search" placeholder="search">
         </div>
+        <div style="width:100%; display:none;" class="loading text-center">
+            <img class="text-center" style="width:100px;" src='@Url.Content(@"~\Content\Images\loading.gif")' />
+        </div>
         <div class="searchTarget"></div>
     </div>
 
-    
+
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
+    <script>
+        $(document).ready(function () {
+            $(".zoomInImages").hover(function () {
+                $(this).css('cursor', 'pointer');
+            });
+            $(".zoomInImages, .softwareImages").mouseenter(function () {
+                $(this).animate({ height: '+=25', width: '+=25' })
+            });
+            $(".zoomInImages, .softwareImages").mouseleave(function () {
+                $(this).animate({ height: '-=25', width: '-=25' });
+            });
+        });
+    </script>
+    <script>
+        $(document).ajaxStart(function () {
+            $(".loading").show();
+        }).ajaxStop(function () {
+            $(".loading").hide();
+        });
+    </script>
     <script>
         $(document).ready(function () {
             $("#search").on("click", function (event) {
@@ -97,7 +124,22 @@
             });
         });
     </script>
-
+    <script>
+        $(document).ready(function () {
+            $(".zoomInImages").click(function () {
+                var slika = $(this).attr('src');
+                var modal = bootbox.dialog({
+                    message: "<img style='width:100%;' src=" + slika + ">",
+                    show: false,
+                    onEscape: function () {
+                        modal.modal("hide");
+                    }
+                });
+                $(".modal-dialog").addClass("bootboxBig");
+                modal.modal("show");
+            });
+        });
+    </script>
 </body>
 </html>
 

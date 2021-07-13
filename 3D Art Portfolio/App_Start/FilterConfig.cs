@@ -7,7 +7,6 @@ namespace _3D_Art_Portfolio
     {
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
-            filters.Add(new HandleErrorAttribute());
         }
     }
 }

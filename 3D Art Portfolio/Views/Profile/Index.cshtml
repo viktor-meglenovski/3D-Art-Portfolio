@@ -9,7 +9,7 @@
             <div class="whiteBg roundedCorners">
                 <h2>@Model.applicationUser.Name @Model.applicationUser.Surname</h2>
                 <hr />
-                <img src="@Url.Content(Model.applicationUser.ProfilePicture)" class="profilePicture">
+                <img src="@Url.Content(Model.applicationUser.ProfilePicture)" class="profilePicture zoomInImages">
                 <hr />
                 <h2>@@@Model.applicationUser.UserName</h2>
                 <hr />
@@ -26,6 +26,7 @@
                 @if (Model.projectEntries.Count == 0)
                 {
                     <h2>No projects available :(</h2>
+                    <hr />
                 }
                 else
                 {
@@ -34,9 +35,9 @@
                             <thead>
                                 <tr style="border-bottom:1px solid black" ; width:100%;>
                                     <th style="width:15%">Name</th>
-                                    <th style="width:20%">Preview</th>
+                                    <th style="width:25%">Preview</th>
                                     <th style="width:25%">Upload Time</th>
-                                    <th style="width:20%"></th>
+                                    <th style="width:25%"></th>
                                     <th style="width:20%"></th>
                                 </tr>
                             </thead>
@@ -45,17 +46,17 @@
                                 {
                                     <tr style="border-bottom:1px solid black">
                                         <td>@pe.Name</td>
-                                        <td><img class="otherImagesWithRatio" alt=@pe.Name src=@Url.Content(pe.MainImage) /></td>
+                                        <td><img class="otherImagesWithRatio zoomInImages" alt=@pe.Name src=@Url.Content(pe.MainImage) style="border:1px solid #d3d3d3; border-radius:10%;"/></td>
                                         <td>@pe.TimeStamp</td>
                                         <td><a href="/Project/ViewProject/@pe.ProjectId" class="btn btn-success btn-size">View details</a></td>
-                                        <td><a href="/Project/EditProject/@pe.ProjectId" class="btn btn-primary btn-size">Edit</a> <a imgUrl=@pe.MainImage projectName=@pe.Name path="/Project/DeleteProject/@pe.ProjectId" class="btn btn-danger btn-size deleteButton">Delete</a></td>
+                                        <td><a href="/Project/EditProject/@pe.ProjectId" class="btn btn-primary btn-size">Edit</a> <a imgUrl="@Url.Content(pe.MainImage)" projectName="@pe.Name" path="/Project/DeleteProject/@pe.ProjectId" class="btn btn-danger btn-size deleteButton">Delete</a></td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                     </div>
                 }
-                <a href="/Project/AddNewProject" class="btn btn-primary">Add a new Project</a>
+                <a href="/Project/AddNewProject" class="btn btn-primary btn-lg">Add a new Project</a>
             </div>
         </div>
     </div>
@@ -67,7 +68,7 @@
                 var link = $(this);
                 bootbox.confirm({
                     title: "<h4>Are you sure that you want to delete the following project?</h4>",
-                    message: "<h3>"+link.attr('projectName'),
+                    message: "<span><h3 style='display:inline-block;'>" + link.attr('projectName') +"</h3> <img style='display:inline-block;margin-left:20px;' class='otherImagesWithRatio thumbnail' src="+link.attr('imgUrl')+" /></span>",
                     callback: function (result) {
                         if (result) {
                             window.location.href = link.attr('path');

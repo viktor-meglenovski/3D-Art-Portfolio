@@ -14,6 +14,7 @@ using System.IO;
 namespace _3D_Art_Portfolio.Controllers
 {
     [Authorize]
+    [HandleError]
     public class AccountController : Controller
     {
         private ApplicationSignInManager _signInManager;

@@ -1,4 +1,21 @@
 ﻿@{
     ViewBag.Title = "3D Art Portfolio";
 }
+<div style="width:100%; margin-top:70px;">
+    <div class="profileInfoContainter roundedCorners whiteBg text-center" style="width:70%; margin:0 auto;">
+        <img style="width:90%;" src="@Url.Content("~/Content/Images/Logo.png")" />
+        <hr />
+        <a style="width:200px;" href="/Home/About" class="btn btn-primary btn-lg">About</a><br /><br />
+        @if (User.Identity.IsAuthenticated)
+        {
+            <a style="width:200px;" href="/Profile/Index" class="btn btn-success btn-lg">My Profile</a><br /><br />
+            <a style="width:200px;" href="javascript:document.getElementById('logoutForm').submit()" class="btn btn-danger btn-lg">Log Off</a><br /><br />
+        }
+        else
+        {
+            <a style="width:200px;" href="/Account/Register" class="btn btn-success btn-lg">Register</a><br /><br />
+            <a style="width:200px;" href="/Account/Login" class="btn btn-success btn-lg">Login</a><br /><br />
+        }
+    </div>
+</div>
 
